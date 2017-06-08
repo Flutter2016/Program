@@ -1,0 +1,94 @@
+// + Windows:  first install winpcap (http://winpcap.org)
+// + Mac:      first open a Terminal and execute this commmand: sudo chmod 777 /dev/bpf*
+//             (must be done each time you reboot your mac)
+
+import org.rsg.carnivore.*;
+import org.rsg.lib.Log;
+String sliders;
+int a = 0;
+int b = 0;
+int c = 0;
+int d = 0;
+int e = 0;
+int a1 = 0;
+int b1 = 0;
+int c1 = 0;
+int d1 = 0;
+int e1 = 0;
+int stcolor = 1;
+int stcolor1 = 0;
+int stcolor2 = 0;
+int stcolor3 = 200;
+
+
+
+void setup(){
+  size(400, 400);
+  background(255);
+  Log.setDebug(true); // Uncomment for verbose mode
+  CarnivoreP5 c = new CarnivoreP5(this); 
+  //c.setVolumeLimit(4); //limit the output volume (optional)
+  //c.setShouldSkipUDP(true); //tcp packets only (optional)
+}
+
+void draw(){
+  fill(255, 10);
+  rect(-10, -10, 420, 420);
+  
+  a = movevar(a, a1, 75);
+  b = movevar(b, b1, 125);
+  c = movevar(c, c1, 175);
+  d = movevar(d, d1, 225);
+  e = movevar(e, e1, 275);
+  
+    
+    frameRate(30);
+  // println(a + "," + b1 + "," + c1 + "," + d1);
+  // delay(1000)
+}
+void keyPressed() {
+  if (stcolor == 3) {
+    stcolor = 1;
+  } else {
+    stcolor++;
+  }
+  
+  if (stcolor == 1) {
+    stcolor1 = key;
+  } else {if (stcolor == 2) {
+    stcolor2 = key;
+  } else {
+    stcolor3 = key;
+  } }
+}  
+
+int movevar(int x1, int x2, int xpos) {
+  stroke(stcolor1, stcolor2, stcolor3);
+  strokeWeight(10);
+  line(xpos, 325 - x1, xpos+50, 325 - x1);    
+  if (x1<x2) {
+    x1++;
+    return x1;   
+  } else { if(x1>x2) {
+    x1--; 
+    return x1;  
+  } else {
+    return x1;   
+  } }
+}
+  
+// Called each time a new packet arrives
+void packetEvent(CarnivorePacket p){
+  println("(" + p.strTransportProtocol + " packet) " + p.senderSocket() + " > " + p.receiverSocket());
+  sliders = p.receiverSocket();
+  String sliders2[] = split(sliders, '.');
+  String sliders3[] = split(sliders, ':');
+  String sliders4[] = split(sliders2[3], ':');
+  a1 = int(sliders2[0]);
+  b1 = int(sliders2[1]);
+  c1 = int(sliders2[2]);
+  d1 = int(sliders4[0]);
+  e1 = int(sliders3[1]);
+  //println("Payload: " + p.ascii());
+  //println("---------------------------\n");
+}
